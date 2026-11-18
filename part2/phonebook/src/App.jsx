@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react'
-import axios from 'axios'
 import Filter from './components/Filter'
 import Form from './components/Form'
 import Persons from './components/Persons'
+import personService from './services/persons'
 
 const App = () => {
   const [persons, setPersons] = useState([])
@@ -17,26 +17,56 @@ const App = () => {
   const addPerson = (event) => {
     event.preventDefault()
     const names = persons.map(person => person.name)
-    if (names.includes(newName)) { alert(`${newName} is already added to phonebook`) }
+    if (names.includes(newName)) {
+      const newPerson = { name: newName, number: newPhone }
+      const existingPerson = persons.find(person => person.name === newName)
+      const shouldUpdate = window.confirm(
+        `${existingPerson.name} is already added to the phonebook, replace the old number with a new one?`
+      )
+      if (shouldUpdate) {
+        personService.update(existingPerson.id, newPerson).then(
+          newPersonResponse => setPersons(persons.map(person => {
+            if (person.id === newPersonResponse.id) {
+              return newPersonResponse
+            }
+            return person
+          }))
+        )
+        setNewName('')
+        setNewPhone('')
+      }
+    }
     else {
-      const newPerson = { name: newName, number: newPhone, id: (persons.length + 1) }
-      setPersons(persons.concat(newPerson))
-      setNewName("")
-      setNewPhone("")
+      const newPerson = { name: newName, number: newPhone }
+      personService.create(newPerson).then(
+        newPerson => setPersons(persons.concat(newPerson))
+      )
+      setNewName('')
+      setNewPhone('')
     }
   }
 
-  const hook = () => {
-    axios
-      .get('http://localhost:3001/persons')
-      .then(response => {
-        setPersons(response.data)
-      })
+  // Getting the db.json in the root after the initial render.
+  useEffect(() => {
+    personService
+      .getAll()
+      .then(initialPersons => setPersons(initialPersons))
+  }, [])
+
+  const personsToShow = filter === "" 
+    ? persons 
+    : persons.filter(person => person.name.includes(filter))
+
+  const deletePerson = (id) => {
+    const delete_ok = window.confirm(
+      `Delete ${persons.find(person => person.id === id).name}?`
+    )
+    if (delete_ok) {
+      personService.deletePerson(id).then(
+        person => console.log('We deleted', person)
+      )
+    }
   }
-
-  useEffect(hook, [])
-
-  const personsToShow = filter === "" ? persons : persons.filter(person => person.name.includes(filter))
 
   return (
     <div>
@@ -51,7 +81,7 @@ const App = () => {
           handlePhoneChange={handlePhoneChange}
       />
       <h2>Numbers</h2>
-      <Persons personsToShow={personsToShow} />
+      <Persons persons={personsToShow} deletePerson={deletePerson} />
     </div>
   )
 }
