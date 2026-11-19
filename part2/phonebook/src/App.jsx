@@ -2,13 +2,16 @@ import { useState, useEffect } from 'react'
 import Filter from './components/Filter'
 import Form from './components/Form'
 import Persons from './components/Persons'
+import Message from './components/Message'
 import personService from './services/persons'
+
 
 const App = () => {
   const [persons, setPersons] = useState([])
   const [newName, setNewName] = useState("")
   const [newPhone, setNewPhone] = useState("")
   const [filter, setFilter] = useState("")
+  const [message, setMessage] = useState("")
 
   const handleNameChange = (event) => setNewName(event.target.value)
   const handlePhoneChange = (event) => setNewPhone(event.target.value)
@@ -24,14 +27,22 @@ const App = () => {
         `${existingPerson.name} is already added to the phonebook, replace the old number with a new one?`
       )
       if (shouldUpdate) {
-        personService.update(existingPerson.id, newPerson).then(
-          newPersonResponse => setPersons(persons.map(person => {
+        personService
+          .update(existingPerson.id, newPerson)
+          .then(newPersonResponse => {
+            setPersons(persons.map(person => {
             if (person.id === newPersonResponse.id) {
               return newPersonResponse
             }
             return person
-          }))
-        )
+            }))
+            setMessage(`${existingPerson.name} has updated its phone number`)
+            setTimeout(() => {setMessage('')}, 3000)
+            })
+          .catch(error => {
+            setMessage(`The person you're trying to update is deleted`)
+            setPersons(persons.filter(person => person.id !== existingPerson.id))
+          })
         setNewName('')
         setNewPhone('')
       }
@@ -43,6 +54,8 @@ const App = () => {
       )
       setNewName('')
       setNewPhone('')
+      setMessage(`${newPerson.name} added to the phonebook`)
+      setTimeout(() => {setMessage('')}, 3000)
     }
   }
 
@@ -63,7 +76,9 @@ const App = () => {
     )
     if (delete_ok) {
       personService.deletePerson(id).then(
-        person => console.log('We deleted', person)
+        deletedPerson => setPersons(
+          persons.filter(person => person.id !== deletedPerson.id)
+        )
       )
     }
   }
@@ -82,6 +97,7 @@ const App = () => {
       />
       <h2>Numbers</h2>
       <Persons persons={personsToShow} deletePerson={deletePerson} />
+      <Message message={message} />
     </div>
   )
 }
