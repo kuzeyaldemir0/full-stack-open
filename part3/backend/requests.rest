@@ -25,3 +25,15 @@ Content-Type: application/json
     "name": "Arto Hellas",
     "number": "040-123456"
 }
+
+###
+GET https://full-stack-open-2y8a.onrender.com/api/persons
+
+###
+POST https://full-stack-open-2y8a.onrender.com/api/persons
+Content-Type: application/json
+
+{
+    "name": "Kuzey Aldemir",
+    "number": "531-855-1358"
+}
