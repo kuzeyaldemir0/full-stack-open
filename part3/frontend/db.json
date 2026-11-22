@@ -1,0 +1,20 @@
+{
+  "persons": [
+    {
+      "name": "kuzey",
+      "number": "0531-855-1358",
+      "id": "UqqzYSGi5f0"
+    },
+    {
+      "name": "umidi zbabo",
+      "number": "0541 123 1243",
+      "id": "keN8k00OmuI"
+    },
+    {
+      "name": "Annem",
+      "number": "0505-359-7376",
+      "id": "V9IZ1C2vtNg"
+    }
+  ],
+  "$schema": "./node_modules/json-server/schema.json"
+}
