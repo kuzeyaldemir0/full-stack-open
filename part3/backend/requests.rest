@@ -37,3 +37,6 @@ Content-Type: application/json
     "name": "Kuzey Aldemir",
     "number": "531-855-1358"
 }
+
+###
+DELETE http://localhost:3001/api/persons/6b03fa016e4ebd94933712e8
