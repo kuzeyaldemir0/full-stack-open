@@ -49,13 +49,18 @@ const App = () => {
     }
     else {
       const newPerson = { name: newName, number: newPhone }
-      personService.create(newPerson).then(
-        newPerson => setPersons(persons.concat(newPerson))
-      )
-      setNewName('')
-      setNewPhone('')
-      setMessage(`${newPerson.name} added to the phonebook`)
-      setTimeout(() => {setMessage('')}, 3000)
+      personService.create(newPerson)
+        .then(newPerson => {
+          setPersons(persons.concat(newPerson))
+          setNewName('')
+          setNewPhone('')
+          setMessage(`${newPerson.name} added to the phonebook`)
+          setTimeout(() => {setMessage('')}, 3000)
+        })
+        .catch(error => {
+          setMessage(`${error.response.data.error}`)
+          setTimeout(() => {setMessage('')}, 3000)
+        })
     }
   }
 
