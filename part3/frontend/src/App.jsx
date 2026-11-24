@@ -39,7 +39,7 @@ const App = () => {
             setMessage(`${existingPerson.name} has updated its phone number`)
             setTimeout(() => {setMessage('')}, 3000)
             })
-          .catch(error => {
+          .catch(() => {
             setMessage(`The person you're trying to update is deleted`)
             setPersons(persons.filter(person => person.id !== existingPerson.id))
           })
@@ -80,11 +80,10 @@ const App = () => {
       `Delete ${persons.find(person => person.id === id).name}?`
     )
     if (delete_ok) {
-      personService.deletePerson(id).then(
-        deletedPerson => setPersons(
-          persons.filter(person => person.id !== id)
-        )
-      )
+      personService.deletePerson(id)
+        .then(() => 
+          setPersons(persons.filter(person => person.id !== id)
+        ))
     }
   }
 
