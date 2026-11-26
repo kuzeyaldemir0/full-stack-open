@@ -74,13 +74,6 @@ mostLikedAuthor = {
   likes: 17
 }
 
-test('dummy returns one', () => {
-  const blogs = []
-
-  const result = listHelper.dummy(blogs)
-  assert.strictEqual(result, 1)
-})
-
 describe('total likes', () => {
 
   test('when there is only one blog, total likes is the likes of that blog', () => {
