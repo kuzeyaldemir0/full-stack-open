@@ -163,6 +163,42 @@ test('try to add a blog post without title', async () => {
   assert.strictEqual(response.body.length, initialBlogs.length)
 })
 
+test('delete a blog', async () => {
+  blogToDelete = initialBlogs[0]
+
+  await api
+    .delete(`/api/blogs/${blogToDelete._id}`)
+    .expect(204)
+
+  const blogs = await Blog.find({})
+  assert.strictEqual(blogs.length, initialBlogs.length - 1)
+  
+  const ids = blogs.map(blog => blog._id)
+  assert(!ids.includes(blogToDelete._id.toString()))
+})
+
+test('get a single blog', async () => {
+  blogToGet = new Blog(initialBlogs[0])
+  
+  const response = await api
+    .get(`/api/blogs/${blogToGet._id}`)
+    .expect(200)
+    .expect('Content-Type', /application\/json/)
+
+  assert.deepStrictEqual(response.body, blogToGet.toJSON())
+})
+
+test.only("change a post's like", async () => {
+  const blogToUpdate = initialBlogs[0]
+
+  const response = await api
+    .put(`/api/blogs/${blogToUpdate._id}`)
+    .send({ likes: blogToUpdate.likes + 5 })
+    .expect('Content-Type', /application\/json/)
+
+  assert.strictEqual(response.body.likes, blogToUpdate.likes + 5)
+})
+
 after (async () => {
   await mongoose.connection.close()
 })

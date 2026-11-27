@@ -22,7 +22,36 @@ blogRouter.post('/', async (request, response) => {
     const savedBlog = await blog.save()
     return response.status(201).json(savedBlog)
   }
-  return response.status(400).json({ error: 'title or url missing' })
+  response.status(400).json({ error: 'title or url missing' })
+})
+
+blogRouter.delete('/:id', async (request, response) => {
+  const id = request.params.id
+  await Blog.findByIdAndDelete(id)
+  response.status(204).end()
+})
+
+blogRouter.get('/:id', async (request, response) => {
+  const blog = await Blog.findById(request.params.id)
+  if (blog) {
+    response.status(200).json(blog)
+  } else {
+    response.status(404).end()
+  }
+})
+
+blogRouter.put('/:id', async (request, response) => {
+  const { likes } = request.body
+
+  const blogToUpdate = await Blog.findById(request.params.id)
+  if (!blogToUpdate) {
+    response.status(404).end()
+  }
+  else {
+    blogToUpdate.likes = likes
+    await blogToUpdate.save()
+    response.json(blogToUpdate)
+  }
 })
 
 module.exports = blogRouter
